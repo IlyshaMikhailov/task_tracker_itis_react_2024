@@ -1,9 +1,9 @@
-import { FooterWrapper, Link } from './styled';
+import { Wrapper, StyledLink } from './styled';
 
 const Footer = () => {
   return (
     <Wrapper>
-      <Link to="/info"></Link>
+      <StyledLink to="/info">© 2024 Stackers team</StyledLink>
     </Wrapper>
   );
 };
