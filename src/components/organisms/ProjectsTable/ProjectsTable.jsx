@@ -1,69 +1,71 @@
 import Button from 'react-bootstrap/Button';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import DeleteModal from '../../molecules/DeleteModal';
 
-import { mockProjects } from './mockProjects';
-
 import { Table, TableHead, TableCol, TableColActions } from './styled';
+import NotifierContext from "../../../context/NotifierContext";
 
-const ProjectsTable = () => {
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState(null);
+const ProjectsTable = ({ projects }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { setMessage, setErrorMessage } = useContext(NotifierContext)
 
-  const handleDeleteButton = (project) => {
-    setProjectToDelete(project);
-    setShowDeleteModal(true);
+
+  const handleOpenModal = (project) => {
+    setIsModalOpen(true);
   }
 
-  const handleDeleteCancelButton = () => {
-    setProjectToDelete(null);
-    setShowDeleteModal(false);
+  const handleCancelButton = () => {
+    setErrorMessage('Удаление проекта отменено');
+    setIsModalOpen(false);
   }
 
-  const handleDeleteConfirmButton = () => {
-    // тут как будто удалили проект
-    setProjectToDelete(null);
-    setShowDeleteModal(false);
+  const handleConfirmButton = () => {
+    // добавить мутацию удаления проекта
+    setMessage('Проект удален');
+    setIsModalOpen(false);
   }
 
   return (
     <>
-    <Table>
-      <thead>
-        <tr>
-          <TableHead>id</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead>Actions</TableHead>
-        </tr>
-      </thead>
+      <Table>
+        <thead>
+          <tr>
+            <TableHead>id</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Actions</TableHead>
+          </tr>
+        </thead>
 
-      <tbody>
-        {mockProjects.map(({ id, name, description }) => {
-          return (
-            <tr key={id}>
-              <TableCol>{id}</TableCol>
-              <TableCol>{name}</TableCol>
-              <TableCol>{description}</TableCol>
-              <TableColActions>
-                <Button variant="light" onClick={() => {}}>Edit</Button>
-                <Button variant="light" onClick={() => {}}>Show</Button>
-                <Button variant="danger" onClick={() => {handleDeleteButton({ id, name, description })}}>Delete</Button>
-              </TableColActions>
-            </tr>
-          )
-        })}
-      </tbody>
-    </Table>
+        <tbody>
+          {projects.map(({ id, name, description }) => {
+            return (
+              <tr key={id}>
+                <TableCol>{id}</TableCol>
+                <TableCol>{name}</TableCol>
+                <TableCol>{description}</TableCol>
 
-    { (showDeleteModal && (
-      <DeleteModal text={`The project "${projectToDelete.name}" will be permanently deleted. Are you sure?`}
-      onCancel={handleDeleteCancelButton}
-      onDelete={handleDeleteConfirmButton}
-      show={showDeleteModal} />))
-    }
+                <TableColActions>
+                  <Button variant="light" onClick={() => {}}>Edit</Button>
+                  <Button variant="light" onClick={() => {}}>Show</Button>
+                  <Button variant="danger" onClick={() => handleOpenModal({ id, name, description })}>Delete</Button>
+                </TableColActions>
+              </tr>
+            )
+          })}
+        </tbody>
+      </Table>
+
+      {isModalOpen && (
+        <DeleteModal
+          // projectName={mock.name}
+          onCancel={handleCancelButton}
+          onDelete={handleConfirmButton}
+          isOpen={isModalOpen}
+        />
+      )}
     </>
   );
 };
